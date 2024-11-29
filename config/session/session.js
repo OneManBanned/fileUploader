@@ -1,8 +1,8 @@
-import session from "express-session";
+import exportSession from "express-session";
 import { PrismaSessionStore } from "@quixo3/prisma-session-store";
-import prisma from "../prismaClient/client";
+import prisma from "../prismaClient/client.js";
 
-const session = session({
+const session = exportSession({
     cookie: {
         maxAge: 24 * 60 * 60 * 1000 
     },
