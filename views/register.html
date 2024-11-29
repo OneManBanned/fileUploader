@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+    <h1>REGISTER</h1> 
+    <% console.log(values) %>
+    <form action="/register" method="POST">
+       <ul>
+        <li><label for="username">Username: </label>
+            <input type="text" id="username" name="username" value="">
+          <span class="error" aria-live="polite" ><% if (errors.username) {%><%= errors.username %><% } %><span>
+        </li>
+        <li><label for="email">Email: </label>
+            <input type="text" id="email" name="email" value="">
+          <span class="error" aria-live="polite" ><% if (errors.email) {%><%= errors.email %><% } %><span>
+        </li>
+        <li><label for="password">Password: </label>
+            <input type="text" id="password" name="password" value="">
+          <span class="error" aria-live="polite" ><% if (errors.password) {%><%= errors.password %><% } %><span>
+        </li>
+        <li><label for="confirmPassword">confirmPassword: </label>
+            <input type="text" id="confirmPassword" name="confirmPassword" value="">
+          <span class="error" aria-live="polite" ><% if (errors.confirmPassword) {%><%= errors.confirmPassword %><% } %><span>
+        </li>
+       </ul> 
+       <button type="submit">Submit</button>
+    </form>
+    </body>
+</html>
