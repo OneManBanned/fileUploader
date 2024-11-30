@@ -5,6 +5,9 @@ const uploadController = {
 
     post: (req, res) => {
         console.log(req.body)
+        console.log(req.file)
+
+        res.redirect('/')
     }
 }
 
