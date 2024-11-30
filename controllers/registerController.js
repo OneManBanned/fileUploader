@@ -1,4 +1,4 @@
-import prisma from "../config/prismaClient/client.js";
+import db from "../config/db/queries.js";
 import asyncHandler from "express-async-handler";
 import { body, validationResult } from "express-validator";
 import { createErrorsMap } from "../utils/createErrorsMap.js";
@@ -22,28 +22,19 @@ const registerController = {
       const valid = validationResult(req);
 
       if (!valid.isEmpty()) {
-        const errors = createErrorsMap(valid.errors);
-        res.render("register.html", { errors: errors, values: req.body });
+        res.render("register.html", {
+          errors: createErrorsMap(valid.errors),
+          values: req.body,
+        });
       } else {
         const { username, email, password } = req.body;
 
-          const saltHash = genPassword(password)
+        const saltHash = genPassword(password);
 
-        const salt = saltHash.salt
-        const hash = saltHash.hash
+        const salt = saltHash.salt;
+        const hash = saltHash.hash;
 
-          console.log(salt, " ", typeof salt, "\n", hash, " ", typeof hash)
-
-        const user = await prisma.user.create({
-          data: {
-            username: username,
-            email: email,
-            hash: hash,
-            salt: salt,
-          },
-        });
-
-          console.log(user)
+        await db.createUser(username, email, hash, salt);
 
         res.redirect("/login");
       }

@@ -1,7 +1,7 @@
 import passport from "passport";
 import asyncHandler from "express-async-handler";
 import localStrategy from "passport-local";
-import prisma from "../prismaClient/client.js";
+import db from "../db/queries.js";
 import { validatePassword } from "../../libs/passportUtils.js";
 
 const customFields = {
@@ -10,15 +10,11 @@ const customFields = {
 };
 
 const verifyCallback = asyncHandler(async (username, password, done) => {
-  const user = await prisma.user.findUnique({
-    where: {
-      email: username,
-    },
-  }); // find user in db
+  const user = await db.findUniqueUserByEmail(username);
 
-  if (!user) return done(null, false); // if no user found return false
+  if (!user) return done(null, false);
 
-  const isValid = validatePassword(password, user.hash, user.salt); // check user entered pw against hash and salt saved in db
+  const isValid = validatePassword(password, user.hash, user.salt);
 
   if (isValid) {
     return done(null, user); // if pw is valid return user
@@ -35,11 +31,9 @@ passport.serializeUser((user, done) => {
   done(null, user.id);
 });
 
-passport.deserializeUser(asyncHandler(async (userId, done) => {
-    const user = await prisma.user.findFirst({
-        where: {
-            id: userId
-        }
-    })
+passport.deserializeUser(
+  asyncHandler(async (userId, done) => {
+    const user = await db.findUserById(userId);
     done(null, user);
-}));
+  }),
+);
