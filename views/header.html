@@ -1,0 +1,9 @@
+<header>
+  <% if (user) { %>
+  <a href="/logout">Logout</a>
+  <a href="/upload">Upload A File</a>
+  <% } else { %>
+  <a href="/register">Register</a>
+  <a href="/login">Login</a>
+  <% } %>
+</header>
