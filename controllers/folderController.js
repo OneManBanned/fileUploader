@@ -1,15 +1,17 @@
 import { validationResult, body, param } from "express-validator";
-import db from "../config/db/queries.js";
+import { CustomBadRequestError } from "../utils/customErrors.js"
 import { createErrorsMap } from "../utils/createErrorsMap.js";
 import asyncHandler from "express-async-handler";
+import db from "../config/db/queries.js";
 
 const validateFolder = [
-    body("name").trim().isLength({ min: 1 }).withMessage("too short"),
+    body("name").trim().exists({ values: "falsy" }).withMessage("required"),
 ];
+
+const validateDelete = [param("folderId").exists({ values: "falsy" })];
 
 const folderController = {
     get: async (req, res) => {
-        console.log(req.params)
         const user = await db.findUserWithFolders(+req.params.userId);
         res.render("folder.html", { folders: user.folders, userId: req.user.id });
     },
@@ -20,7 +22,11 @@ const folderController = {
 
     getEdit: async (req, res) => {
         const folder = await db.findFolderById(+req.params.folderId);
-        res.render("edit.html", { values: folder, folderId: req.params.folderId, errors: {} });
+        res.render("edit.html", {
+            values: folder,
+            folderId: req.params.folderId,
+            errors: {},
+        });
     },
 
     postCreate: [
@@ -35,7 +41,7 @@ const folderController = {
                     values: req.body,
                 });
                 next();
-            } 
+            }
 
             await db.createFolder(req.body.name, +req.user.id);
 
@@ -46,7 +52,6 @@ const folderController = {
     postEdit: [
         validateFolder,
         asyncHandler(async (req, res, next) => {
-
             const valid = validationResult(req);
 
             if (!valid.isEmpty()) {
@@ -58,7 +63,23 @@ const folderController = {
                 next();
             }
 
-            await db.updateFolderById(+req.params.folderId, req.body.name)
+            await db.updateFolderById(+req.params.folderId, req.body.name);
+
+            res.redirect(`/folder/${req.user.id}`);
+        }),
+    ],
+
+    delete: [
+        validateDelete,
+        asyncHandler(async (req, res) => {
+
+            const valid = validationResult(req);
+
+            if (!valid.isEmpty()) {
+                throw new CustomBadRequestError()
+            }
+
+            await db.deleteFolderById(+req.params.folderId);
 
             res.redirect(`/folder/${req.user.id}`);
         }),

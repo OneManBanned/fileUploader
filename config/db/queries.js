@@ -1,46 +1,55 @@
 import prisma from "../prismaClient/client.js";
 
 const db = {
-    
-  // Create queries
+    // Create queries
 
-  createUser: async (username, email, hash, salt) => {
-    await prisma.user.create({
-      data: {
-        username: username,
-        email: email,
-        hash: hash,
-        salt: salt,
-      },
-    });
-  },
+    createUser: async (username, email, hash, salt) => {
+        await prisma.user.create({
+            data: {
+                username: username,
+                email: email,
+                hash: hash,
+                salt: salt,
+            },
+        });
+    },
 
     createFolder: async (name, id) => {
         await prisma.folder.create({
             data: {
-            name: name,
-            ownerId: id,
+                name: name,
+                ownerId: id,
             },
+        });
+    },
+
+    // Delete queries
+
+    deleteFolderById: async (id) => {
+        await prisma.folder.delete({
+            where: {
+                id: id
+            }
         })
     },
 
-  // Find queries
+    // Find queries
 
-  findUserById: async (id) => {
-    return await prisma.user.findFirst({
-      where: {
-        id: id,
-      },
-    });
-  },
+    findUserById: async (id) => {
+        return await prisma.user.findFirst({
+            where: {
+                id: id,
+            },
+        });
+    },
 
-  findUniqueUserByEmail: async (username) => {
-    return await prisma.user.findUnique({
-      where: {
-        email: username,
-      },
-    });
-  },
+    findUniqueUserByEmail: async (username) => {
+        return await prisma.user.findUnique({
+            where: {
+                email: username,
+            },
+        });
+    },
 
     findUserWithFolders: async (id) => {
         return await prisma.user.findUnique({
@@ -49,29 +58,28 @@ const db = {
             },
             include: {
                 folders: true,
-            }
-        })
+            },
+        });
     },
 
     findFolderById: async (id) => {
         return await prisma.folder.findUnique({
             where: {
                 id: id,
-            }
-        })
+            },
+        });
     },
 
     updateFolderById: async (id, name) => {
         await prisma.folder.update({
             where: {
-                id: id
+                id: id,
             },
             data: {
-                name: name
-            }
-        })
-    }
-
+                name: name,
+            },
+        });
+    },
 };
 
 export default db;

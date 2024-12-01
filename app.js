@@ -29,7 +29,8 @@ app.use("/upload", isAuth, uploadRoute)
 app.use("/folder", isAuth, folderRoute)
 app.get("/", (req, res) => res.render("index.html", {userId: req.user.id}))
 app.use((err, req, res, next) => {
-    console.error(err)
+    console.error("ERROR HANDLER", err)
+    res.status(err.statusCode || 500).send(err.statusCode);
 })
 
 app.listen(PORT, () => console.log(`listening on http//localhost:${PORT}`))
