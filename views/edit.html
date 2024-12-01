@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>Edit folder details</h1>
+        <form action="/folder/edit/<%= folderId %>" method="POST">
+           <ul>
+               <%  %>
+            <label for="name">Folder Name: </label>
+            <input type="text" id="name" name="name" value="<%= values.name %>">
+            <span class="error" aria-live="polite" ><% if (errors.name) {%><%= errors.name %><% } %><span>
+           </ul> 
+        </form>
+    </body>
+</html>

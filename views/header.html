@@ -1,7 +1,7 @@
 <header>
-  <% if (user) { %>
+  <% if (userId) { %>
   <a href="/logout">Logout</a>
-  <a href="/upload">Upload A File</a>
+  <a href="/folder/<%= userId %>">View Folders</a>
   <% } else { %>
   <a href="/register">Register</a>
   <a href="/login">Login</a>

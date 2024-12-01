@@ -15,6 +15,15 @@ const db = {
     });
   },
 
+    createFolder: async (name, id) => {
+        await prisma.folder.create({
+            data: {
+            name: name,
+            ownerId: id,
+            },
+        })
+    },
+
   // Find queries
 
   findUserById: async (id) => {
@@ -32,6 +41,37 @@ const db = {
       },
     });
   },
+
+    findUserWithFolders: async (id) => {
+        return await prisma.user.findUnique({
+            where: {
+                id: id,
+            },
+            include: {
+                folders: true,
+            }
+        })
+    },
+
+    findFolderById: async (id) => {
+        return await prisma.folder.findUnique({
+            where: {
+                id: id,
+            }
+        })
+    },
+
+    updateFolderById: async (id, name) => {
+        await prisma.folder.update({
+            where: {
+                id: id
+            },
+            data: {
+                name: name
+            }
+        })
+    }
+
 };
 
 export default db;

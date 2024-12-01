@@ -3,6 +3,7 @@ import ejs from "ejs"
 import session from "./config/session/session.js";
 import registerRoute from "./routes/registerRoute.js";
 import loginRoute from "./routes/loginRoute.js";
+import folderRoute from "./routes/folderRoute.js";
 import logoutRoute from "./routes/logoutRoute.js";
 import uploadRoute from "./routes/uploadRoute.js";
 import passport from "passport";
@@ -25,7 +26,8 @@ app.use("/register", registerRoute)
 app.use("/login", loginRoute)
 app.use("/logout", logoutRoute)
 app.use("/upload", isAuth, uploadRoute)
-app.get("/", (req, res) => res.render("index.html", {user: req.user}))
+app.use("/folder", isAuth, folderRoute)
+app.get("/", (req, res) => res.render("index.html", {userId: req.user.id}))
 app.use((err, req, res, next) => {
     console.error(err)
 })
