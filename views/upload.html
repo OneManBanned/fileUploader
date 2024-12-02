@@ -1,20 +1,28 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title></title>
-    <link href="css/style.css" rel="stylesheet" />
-  </head>
-  <body>
-    <form action="/upload" method="POST" enctype="multipart/form-data">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <title></title>
+        <link href="css/style.css" rel="stylesheet">
+    </head>
+    <body>
+        <h1>User Folder <%= folder.name %></h1> 
+        <%= console.log(folder) %>
+   <form action="/folder/upload/<%= folder.id %>" method="POST" enctype="multipart/form-data">
       <ul>
         <li>
           <label for="file">Upload a file: </label>
-          <input type="file" name="file" id="file" />
+          <input type="file" name="files" id="file" multiple/>
         </li>
       </ul>
       <button type="submit">Submit</button>
     </form>
-  </body>
+<ul>
+    <% folder.files.forEach(f => { %>
+    <% console.log(f) %>
+    <li><a href="/folder/file/<%= f.id %>"><%= f.originalName %></a></li>
+    <% }) %>
+</ul>
+    </body>
 </html>

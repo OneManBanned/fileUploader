@@ -1,8 +1,13 @@
 import { validationResult, body, param } from "express-validator";
-import { CustomBadRequestError } from "../utils/customErrors.js"
+import { CustomBadRequestError } from "../utils/customErrors.js";
 import { createErrorsMap } from "../utils/createErrorsMap.js";
 import asyncHandler from "express-async-handler";
 import db from "../config/db/queries.js";
+import multer from "multer";
+
+const upload = multer({dest: 'uploads/'})
+
+const uploadMiddleware = upload.array('files', 12)
 
 const validateFolder = [
     body("name").trim().exists({ values: "falsy" }).withMessage("required"),
@@ -27,6 +32,16 @@ const folderController = {
             folderId: req.params.folderId,
             errors: {},
         });
+    },
+
+    getFolder: async (req, res) => {
+        const folder = await db.findFolderById(+req.params.folderId);
+        res.render("upload.html", { folder: folder });
+    },
+
+    getFile: async (req, res) => {
+        const file = await db.findFileById(+req.params.fileId)
+        res.render("file.html", {file: file})
     },
 
     postCreate: [
@@ -69,14 +84,33 @@ const folderController = {
         }),
     ],
 
+    postFile: [
+        uploadMiddleware,
+        asyncHandler(async (req, res) => {
+            console.log("ROUTE HIT", req.files, req.params );
+
+            const data = [];
+
+            req.files.forEach(file => {
+                let fileInfo = {originalName: file.originalname, path: file.path, size: file.size, folderId: +req.params.folderId}
+                data.push(fileInfo)
+            })
+
+            await db.createManyFiles(data)
+
+            res.redirect(`/folder/${req.user.id}`);
+        }),
+    ],
+
+    // delete queries
+
     delete: [
         validateDelete,
         asyncHandler(async (req, res) => {
-
             const valid = validationResult(req);
 
             if (!valid.isEmpty()) {
-                throw new CustomBadRequestError()
+                throw new CustomBadRequestError();
             }
 
             await db.deleteFolderById(+req.params.folderId);

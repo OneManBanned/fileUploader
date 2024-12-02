@@ -23,6 +23,13 @@ const db = {
         });
     },
 
+    createManyFiles: async (data) => {
+        await prisma.file.createMany({
+            data: data,
+            skipDuplicates: false
+        })
+    },
+
     // Delete queries
 
     deleteFolderById: async (id) => {
@@ -67,7 +74,18 @@ const db = {
             where: {
                 id: id,
             },
+            include: {
+                files: true
+            }
         });
+    },
+
+    findFileById: async(id) => {
+        return await prisma.file.findUnique({
+            where: {
+                id: id
+            }
+        })
     },
 
     updateFolderById: async (id, name) => {
