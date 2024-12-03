@@ -42,6 +42,18 @@ const db = {
 
     // Find queries
 
+    getFilePath: async (id) => {
+        console.log("queries.js: ", id)
+        return await prisma.file.findUnique({
+            where: {
+                id: id
+            },
+            select: {
+                path: true
+            }
+        })
+    },
+
     findUserById: async (id) => {
         return await prisma.user.findFirst({
             where: {

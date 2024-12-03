@@ -8,6 +8,13 @@
     </head>
     <body>
    <h1>File Info</h1> 
-   <% console.log(file) %>
+   <% console.log("file.html", file) %>
+   <ul>
+       <li><span><%= file.originalName %></span> - <span><%= file.size %></span> - <span><%= file.created_at %></span> - 
+           <form action="/folder/file/<%= file.id %>" method="POST" >
+               <button type="submt">Download</button>
+           </form>
+       </li>
+   </ul>
     </body>
 </html>
