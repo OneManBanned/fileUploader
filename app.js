@@ -8,11 +8,17 @@ import logoutRoute from "./routes/logoutRoute.js";
 import uploadRoute from "./routes/uploadRoute.js";
 import passport from "passport";
 import { isAuth } from "./utils/isAuth.js";
+import { fileURLToPath } from "url"
+import { dirname } from "path"
+
+const __filename = fileURLToPath(import.meta.url);
+export const __dirname = dirname(__filename);
 
 const PORT = 3000;
 const app = express();
 
 app.engine("html", ejs.renderFile);
+app.use(express.static("public"))
 
 app.use(express.urlencoded({ extended: true }));
 
