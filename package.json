@@ -13,6 +13,7 @@
   "license": "ISC",
   "dependencies": {
     "@quixo3/prisma-session-store": "^3.1.13",
+    "@supabase/supabase-js": "^2.46.2",
     "bcryptjs": "^2.4.3",
     "ejs": "^3.1.10",
     "express": "^4.21.1",
@@ -23,5 +24,8 @@
     "passport": "^0.7.0",
     "passport-local": "^1.0.0",
     "prisma": "^6.0.0"
+  },
+  "devDependencies": {
+    "base64-arraybuffer": "^1.0.2"
   }
 }
