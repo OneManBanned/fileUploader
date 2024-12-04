@@ -1,39 +1,44 @@
 import passport from "passport";
-import asyncHandler from "express-async-handler";
 import localStrategy from "passport-local";
 import db from "../db/queries.js";
 import { validatePassword } from "../../libs/passportUtils.js";
 
 const customFields = {
-  usernameField: "email",
-  passwordField: "password",
+    usernameField: "email",
+    passwordField: "password",
 };
 
-const verifyCallback = asyncHandler(async (username, password, done) => {
-  const user = await db.findUniqueUserByEmail(username);
+const verifyCallback = async (username, password, done) => {
+    try {
+        const user = await db.findUniqueUserByEmail(username);
 
-  if (!user) return done(null, false);
+        if (!user) return done(null, false);
 
-  const isValid = validatePassword(password, user.hash, user.salt);
+        const isValid = validatePassword(password, user.hash, user.salt);
 
-  if (isValid) {
-    return done(null, user); // if pw is valid return user
-  } else {
-    return done(null, false); // if pw is not valid return false
-  }
-});
+        if (isValid) {
+            return done(null, user); // if pw is valid return user
+        } else {
+            return done(null, false); // if pw is not valid return false
+        }
+    } catch(err) {
+        done(err);
+    }
+};
 
 const strategy = new localStrategy(customFields, verifyCallback);
 
 passport.use(strategy);
 
 passport.serializeUser((user, done) => {
-  done(null, user.id);
+    done(null, user.id);
 });
 
-passport.deserializeUser(
-  asyncHandler(async (userId, done) => {
-    const user = await db.findUserById(userId);
-    done(null, user);
-  }),
-);
+passport.deserializeUser(async (userId, done) => {
+    try {
+        const user = await db.findUserById(userId);
+        done(null, user);
+    } catch(err) {
+        done(err);
+    }
+});
