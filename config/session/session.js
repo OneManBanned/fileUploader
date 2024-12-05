@@ -9,12 +9,7 @@ const session = exportSession({
     secret: process.env.SESSIONSECRET,
     resave: true,
     saveUninitialized: true,
-    store: new PrismaSessionStore(
-        prisma,
-        {
-        checkPeriod: 2 * 60 * 1000,
-        dbRecordIdIsSessionId: true,
-        dbRecordIdFunction: undefined,
+    store: new PrismaSessionStore( prisma, { checkPeriod: 2 * 60 * 1000, dbRecordIdIsSessionId: true, dbRecordIdFunction: undefined,
         }
     )
 });

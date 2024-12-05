@@ -5,7 +5,6 @@ import registerRoute from "./routes/registerRoute.js";
 import loginRoute from "./routes/loginRoute.js";
 import folderRoute from "./routes/folderRoute.js";
 import logoutRoute from "./routes/logoutRoute.js";
-import uploadRoute from "./routes/uploadRoute.js";
 import passport from "passport";
 import { isAuth } from "./utils/isAuth.js";
 import { fileURLToPath } from "url"
@@ -31,7 +30,6 @@ app.use(passport.session());
 app.use("/register", registerRoute);
 app.use("/login", loginRoute);
 app.use("/logout", logoutRoute);
-app.use("/upload", isAuth, uploadRoute);
 app.use("/folder", isAuth, folderRoute);
 app.get("/", (req, res) => {
     const userId = req.user ? req.user.id : undefined
@@ -39,7 +37,7 @@ app.get("/", (req, res) => {
 });
 app.use((err, req, res, next) => {
     console.error("ERROR HANDLER", err);
-    res.status(err.statusCode || 500).send(err.statusCode);
+    res.sendStatus(err.statusCode || 500);
 });
 
 app.listen(PORT, () => console.log(`listening on http//localhost:${PORT}`));
