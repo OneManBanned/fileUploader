@@ -5,10 +5,15 @@ import { __dirname } from "../app.js";
 import asyncHandler from "express-async-handler";
 import db from "../config/db/queries.js";
 import multer from "multer";
+import supabase from "../config/prismaClient/supabaseClient.js";
+import pkg from "base64-arraybuffer";
 
-const upload = multer({ dest: "uploads/" });
+const { decode } = pkg;
 
-const uploadMiddleware = upload.array("files", 12);
+const storage = multer.memoryStorage();
+const upload = multer({ storage: storage });
+
+const uploadMiddleware = upload.single("files");
 
 const validateFolder = [
   body("name").trim().exists({ values: "falsy" }).withMessage("required"),
@@ -87,30 +92,52 @@ const folderController = {
 
   postFile: [
     uploadMiddleware,
-    asyncHandler(async (req, res) => {
+    asyncHandler(async (req, res, next) => {
+      const dataArr = [];
 
-      const data = [];
+      console.log(req.file);
 
-      req.files.forEach((file) => {
-        let fileInfo = {
-          originalName: file.originalname,
-          path: file.path,
-          size: file.size,
-          folderId: +req.params.folderId,
-        };
-        data.push(fileInfo);
-      });
+      if (!req.file) {
+        res.status(400).json({ message: "Please upload a file" });
+        return;
+      }
 
-      await db.createManyFiles(data);
+      const { originalname, size, buffer } = req.file;
+      const { folderId } = req.params;
+
+      console.log(req.file);
+
+      const fileBase64 = decode(buffer.toString("base64"));
+
+      const { data, error } = await supabase.storage.from("files").upload(originalname, fileBase64);
+
+      if (error) {
+        console.error("SUPABASE ERROR: ", error);
+      }
+
+      if (data) {
+        console.log(data);
+      }
+
+      let fileInfo = {
+        originalName: originalname,
+        size: size,
+        folderId: +folderId,
+        path: "",
+      };
+
+      dataArr.push(fileInfo);
+
+      await db.createFile(dataArr);
 
       res.redirect(req.get("referer"));
     }),
   ],
 
   downloadFile: asyncHandler(async (req, res) => {
-      const { path } = await db.getFilePath(+req.params.fileId)
-      const file = `${__dirname}/${path}`
-      res.download(file)
+    const { path } = await db.getFilePath(+req.params.fileId);
+    const file = `${__dirname}/${path}`;
+    res.download(file);
   }),
 
   delete: [

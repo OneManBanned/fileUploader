@@ -1,4 +1,4 @@
-import prisma from "../prismaClient/client.js";
+import prisma from "../prismaClient/prismaClient.js";
 
 const db = {
     // Create queries
@@ -23,10 +23,9 @@ const db = {
         });
     },
 
-    createManyFiles: async (data) => {
-        await prisma.file.createMany({
-            data: data,
-            skipDuplicates: false
+    createFile: async (data) => {
+        await prisma.file.create({
+            data: data[0],
         })
     },
 
@@ -43,7 +42,6 @@ const db = {
     // Find queries
 
     getFilePath: async (id) => {
-        console.log("queries.js: ", id)
         return await prisma.file.findUnique({
             where: {
                 id: id
