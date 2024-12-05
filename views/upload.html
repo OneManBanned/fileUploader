@@ -8,7 +8,6 @@
     </head>
     <body>
         <h1>User Folder <%= folder.name %></h1> 
-        <%= console.log(folder) %>
    <form action="/folder/upload/<%= folder.id %>" method="POST" enctype="multipart/form-data">
       <ul>
         <li>
@@ -20,7 +19,6 @@
     </form>
 <ul>
     <% folder.files.forEach(f => { %>
-    <% console.log(f) %>
     <li><a href="/folder/file/<%= f.id %>"><%= f.originalName %></a></li>
     <% }) %>
 </ul>
