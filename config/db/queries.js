@@ -1,4 +1,4 @@
-import prisma from "../prismaClient/prismaClient.js";
+import prisma from "../clients/prismaClient.js";
 
 const db = {
     // Create queries
