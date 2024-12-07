@@ -1,17 +1,19 @@
 import { validationResult, body, param } from "express-validator";
 import { CustomBadRequestError } from "../utils/customErrors.js";
 import { createErrorsMap } from "../utils/createErrorsMap.js";
-import { __dirname } from "../app.js";
 import asyncHandler from "express-async-handler";
 import db from "../config/db/queries.js";
 import multer from "multer";
-import supabase from "../config/prismaClient/supabaseClient.js";
-import pkg from "base64-arraybuffer";
+import { v2 as cloudinary } from "cloudinary";
+import { __dirname } from "../app.js";
 
-const { decode } = pkg;
+cloudinary.config({
+    cloud_name: "dt1jooy8f",
+    api_key: process.env.CLOUDINARY_API_KEY,
+    api_secret: process.env.CLOUDINARY_API_SECRET,
+});
 
-const storage = multer.memoryStorage();
-const upload = multer({ storage: storage });
+const upload = multer({ dest: "uploads/" });
 
 const uploadMiddleware = upload.single("files");
 
@@ -95,34 +97,21 @@ const folderController = {
         asyncHandler(async (req, res, next) => {
             const dataArr = [];
 
-            const { data: d } = await supabase.auth.getSession()
-
-            console.log(d)
-
             if (!req.file) {
                 res.status(400).json({ message: "Please upload a file" });
                 return;
             }
 
-            const { originalname, size, buffer } = req.file;
+            const { originalname, size, path } = req.file;
+
             const { folderId } = req.params;
 
             console.log(req.file);
+            console.log(`${__dirname}/${path}`);
 
-            const fileBase64 = decode(buffer.toString("base64"));
+            const results = await cloudinary.uploader.upload(`${__dirname}/${path}`);
 
-            const { data, error } = await supabase.storage
-                .from("files")
-                .upload(originalname, fileBase64);
-
-            if (error) {
-                console.error("SUPABASE ERROR: ", error);
-            }
-
-            if (data) {
-                console.log(data);
-            }
-
+            console.log(results);
             let fileInfo = {
                 originalName: originalname,
                 size: size,
