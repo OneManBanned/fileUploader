@@ -1,11 +1,11 @@
 import { validationResult, body, param } from "express-validator";
 import { CustomBadRequestError } from "../utils/customErrors.js";
 import { createErrorsMap } from "../utils/createErrorsMap.js";
+import { v2 as cloudinary } from "cloudinary";
+import { __dirname } from "../app.js";
 import asyncHandler from "express-async-handler";
 import db from "../config/db/queries.js";
 import multer from "multer";
-import { v2 as cloudinary } from "cloudinary";
-import { __dirname } from "../app.js";
 
 cloudinary.config({
     cloud_name: "dt1jooy8f",
@@ -95,33 +95,14 @@ const folderController = {
     postFile: [
         uploadMiddleware,
         asyncHandler(async (req, res, next) => {
-            const dataArr = [];
-
-            if (!req.file) {
-                res.status(400).json({ message: "Please upload a file" });
-                return;
-            }
+            if (!req.file) throw new CustomBadRequestError("Please upload a file");
 
             const { originalname, size, path } = req.file;
-
             const { folderId } = req.params;
 
-            console.log(req.file);
-            console.log(`${__dirname}/${path}`);
+            const url = await storeFileIn(cloudinary, `${__dirname}/${path}`);
 
-            const results = await cloudinary.uploader.upload(`${__dirname}/${path}`);
-
-            console.log(results);
-            let fileInfo = {
-                originalName: originalname,
-                size: size,
-                folderId: +folderId,
-                path: "",
-            };
-
-            dataArr.push(fileInfo);
-
-            await db.createFile(dataArr);
+            await db.createFile(originalname, size, folderId, url);
 
             res.redirect(req.get("referer"));
         }),
@@ -138,9 +119,7 @@ const folderController = {
         asyncHandler(async (req, res) => {
             const valid = validationResult(req);
 
-            if (!valid.isEmpty()) {
-                throw new CustomBadRequestError();
-            }
+            if (!valid.isEmpty()) throw new CustomBadRequestError();
 
             await db.deleteFolderById(+req.params.folderId);
 
@@ -150,3 +129,41 @@ const folderController = {
 };
 
 export default folderController;
+
+async function storeFileIn(service, filePath) {
+    const results = await service.uploader.upload(filePath);
+    const url = service.url(results.public_id, {
+        transformation: [
+            {
+                quality: "auto",
+                fetch_format: "auto",
+            },
+        ],
+    });
+
+    return url;
+}
+/*
+{
+  asset_id: 'cdef98098fedf197d1218c5187203368',
+  public_id: 'gswz7oepkhtbwiisnxyz',
+  version: 1733652188,
+  version_id: 'b8cfadef150769f59465d917c34865d9',
+  signature: 'f0415adae3f5331ea43d19dcfc2a0d3841d910af',
+  width: 3024,
+  height: 4032,
+  format: 'jpg',
+  resource_type: 'image',
+  created_at: '2024-12-08T10:03:08Z',
+  tags: [],
+  bytes: 3999555,
+  type: 'upload',
+  etag: '501c8ea74ad1f5871d8c2d7b0a40f358',
+  placeholder: false,
+  url: 'http://res.cloudinary.com/dt1jooy8f/image/upload/v1733652188/gswz7oepkhtbwiisnxyz.jpg',
+  secure_url: 'https://res.cloudinary.com/dt1jooy8f/image/upload/v1733652188/gswz7oepkhtbwiisnxyz.jpg',
+  folder: '',
+  original_filename: '0e40fd69b64ff62f5c01ab62fd0fe0b3',
+  api_key: '142684562959928'
+}
+*/

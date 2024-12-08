@@ -23,10 +23,16 @@ const db = {
         });
     },
 
-    createFile: async (data) => {
+    createFile: async (name, size, folderId, url) => {
         await prisma.file.create({
-            data: data[0],
-        })
+            data: {
+                    originalName: name,
+                    size: size,
+                    folderId: +folderId,
+                    path: url,
+                },
+            
+        });
     },
 
     // Delete queries
@@ -34,9 +40,9 @@ const db = {
     deleteFolderById: async (id) => {
         await prisma.folder.delete({
             where: {
-                id: id
-            }
-        })
+                id: +id,
+            },
+        });
     },
 
     // Find queries
@@ -44,12 +50,12 @@ const db = {
     getFilePath: async (id) => {
         return await prisma.file.findUnique({
             where: {
-                id: id
+                id: id,
             },
             select: {
-                path: true
-            }
-        })
+                path: true,
+            },
+        });
     },
 
     findUserById: async (id) => {
@@ -85,17 +91,17 @@ const db = {
                 id: id,
             },
             include: {
-                files: true
-            }
+                files: true,
+            },
         });
     },
 
-    findFileById: async(id) => {
+    findFileById: async (id) => {
         return await prisma.file.findUnique({
             where: {
-                id: id
-            }
-        })
+                id: id,
+            },
+        });
     },
 
     updateFolderById: async (id, name) => {
