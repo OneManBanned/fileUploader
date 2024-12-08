@@ -12,7 +12,7 @@
    <ul>
        <li><span><%= file.originalName %></span> - <span><%= file.size %></span> - <span><%= file.created_at %></span> - 
            <form action="/folder/file/<%= file.id %>" method="POST" >
-               <button type="submt">Download</button>
+               <a href="<%= file.path %>">Download</a>
            </form>
        </li>
    </ul>

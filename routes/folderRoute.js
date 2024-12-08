@@ -9,7 +9,6 @@ folderRoute.get("/upload/:folderId", folderController.getFolder);
 folderRoute.post("/upload/:folderId", folderController.postFile);
 
 folderRoute.get("/file/:fileId", folderController.getFile)
-folderRoute.post("/file/:fileId", folderController.downloadFile)
 
 folderRoute.get("/create/:userId", folderController.getCreate);
 folderRoute.post("/create/:userId", folderController.postCreate);

@@ -48,8 +48,9 @@ const folderController = {
     },
 
     getFile: async (req, res) => {
+        const { path } = await db.getFilePath(+req.params.fileId);
         const file = await db.findFileById(+req.params.fileId);
-        res.render("file.html", { file: file });
+        res.render("file.html", { file: file, path: path });
     },
 
     postCreate: [
@@ -108,12 +109,6 @@ const folderController = {
         }),
     ],
 
-    downloadFile: asyncHandler(async (req, res) => {
-        const { path } = await db.getFilePath(+req.params.fileId);
-        const file = `${__dirname}/${path}`;
-        res.download(file);
-    }),
-
     delete: [
         validateDelete,
         asyncHandler(async (req, res) => {
@@ -121,7 +116,7 @@ const folderController = {
 
             if (!valid.isEmpty()) throw new CustomBadRequestError();
 
-            await db.deleteFolderById(+req.params.folderId);
+            await db.deleteFolderById(req.params.folderId);
 
             res.redirect(`/folder/${req.user.id}`);
         }),
@@ -139,6 +134,7 @@ async function storeFileIn(service, filePath) {
                 fetch_format: "auto",
             },
         ],
+        flags: "attachment:imgname"
     });
 
     return url;
